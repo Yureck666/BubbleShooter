@@ -18,8 +18,6 @@ public class GridBalls : MonoBehaviour
 
     private Grid _grid;
     private Ball[,] _awesomeBalls;
-    private List<Ball> _properBalls;
-    private List<Ball> _saveBalls;
 
     private Grid Grid
     {
@@ -67,8 +65,6 @@ public class GridBalls : MonoBehaviour
     private void Awake()
     {
         onPlaceBallFinish = new UnityEvent();
-        _properBalls = new List<Ball>();
-        _saveBalls = new List<Ball>();
         _grid = GetComponent<Grid>();
         Fit();
     }
@@ -116,11 +112,11 @@ public class GridBalls : MonoBehaviour
         flyBall.SetGridPosition(position);
         flyBall.transform.SetParent(transform);
         flyBall.LocalMoveToPositionAnimated(Grid.GetCellCenterLocal(position));
-        CheckNeighborsColor(flyBall);
-        if (_properBalls.Count >= 3)
-            DestroyBalls();
-        else
-            ClearProperBallsList();
+        
+        var properBalls = CheckNeighborsColor(flyBall);
+        if (properBalls.Length >= 3)
+            DestroyBalls(properBalls);
+        
         FallAllFreeBalls();
         
         onPlaceBallFinish.Invoke();
@@ -133,7 +129,7 @@ public class GridBalls : MonoBehaviour
 
     private void FallAllFreeBalls()
     {
-        _saveBalls.Clear();
+        var saveBalls = new List<Ball>();
         var gridPosition = new Vector3Int(0, 0);
         for (var x = 0; x < gridWidth; x++)
         {
@@ -141,70 +137,66 @@ public class GridBalls : MonoBehaviour
             var ball = GetBall(gridPosition);
             if (ball != null)
             {
-                AddAllConnectedBallsRecursively(ball);
+                AddAllConnectedBallsRecursively(ball, saveBalls);
             }
         }
 
         foreach (var ball in _awesomeBalls)
         {
-            if (!_saveBalls.Contains(ball) && ball != null)
+            if (!saveBalls.Contains(ball) && ball != null)
                 ball.FallDestroy();
         }
     }
 
-    private void AddAllConnectedBallsRecursively(Ball ball)
+    private void AddAllConnectedBallsRecursively(Ball ball, List<Ball> balls)
     {
-        _saveBalls.Add(ball);
+        balls.Add(ball);
         var neighbors = GetNeighbors(ball.GridPosition)
             .Where(neighbor =>
             {
                 var neighborBall = GetBall(neighbor);
-                return !_saveBalls.Contains(neighborBall) &&
+                return !balls.Contains(neighborBall) &&
                        neighborBall != null;
             })
             .ToArray();
-        _saveBalls.AddRange(neighbors.Select(GetBall));
+        balls.AddRange(neighbors.Select(GetBall));
         foreach (var neighbor in neighbors)
         {
-            AddAllConnectedBallsRecursively(GetBall(neighbor));
+            AddAllConnectedBallsRecursively(GetBall(neighbor), balls);
         }
     }
 
-    private void CheckNeighborsColor(Ball ball)
+    private Ball[] CheckNeighborsColor(Ball ball, List<Ball> balls = null)
     {
-        _properBalls.Add(ball);
+        balls ??= new List<Ball>();
+        balls.Add(ball);
         var neighbors = GetNeighbors(ball.GridPosition)
             .Where(neighbor =>
             {
                 var neighborBall = GetBall(neighbor);
-                return !_properBalls.Contains(neighborBall) &&
+                return !balls.Contains(neighborBall) &&
                        neighborBall != null &&
                        neighborBall.GetColor() == ball.GetColor();
             })
             .ToArray();
-        _properBalls.AddRange(neighbors.Select(GetBall));
+        balls.AddRange(neighbors.Select(GetBall));
         foreach (var neighbor in neighbors)
         {
-            CheckNeighborsColor(GetBall(neighbor));
+            CheckNeighborsColor(GetBall(neighbor), balls);
         }
+
+        return balls.ToArray();
     }
 
-    private void DestroyBalls()
+    private void DestroyBalls(Ball[] balls)
     {
         var index = 0;
-        foreach (var ball in _properBalls)
+        foreach (var ball in balls)
         {
             var gridPosition = ball.GridPosition;
             _awesomeBalls[gridPosition.x, gridPosition.y] = null;
             ball.ScaleDestroy(index*ballsDestroyInterval);
             index++;
         }
-
-        ClearProperBallsList();
-    }
-
-    private void ClearProperBallsList()
-    {
-        _properBalls.Clear();
     }
 }

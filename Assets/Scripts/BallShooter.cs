@@ -17,6 +17,7 @@ public class BallShooter : MonoBehaviour
 
     private void Awake()
     {
+        _readyToShoot = true;
         _mainCamera = Camera.main;
         
         inputCatcher.Init();
