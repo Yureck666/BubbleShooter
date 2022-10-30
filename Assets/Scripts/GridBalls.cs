@@ -6,6 +6,7 @@ using JetBrains.Annotations;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
+using Random = UnityEngine.Random;
 
 [RequireComponent(typeof(Grid))]
 public class GridBalls : MonoBehaviour
@@ -13,6 +14,13 @@ public class GridBalls : MonoBehaviour
     [SerializeField] private int gridWidth;
     [SerializeField] private int gridHeight;
     [SerializeField] private float ballsDestroyInterval;
+    [SerializeField] private GameUi gameUi;
+    
+    [Space, Header("Random")]
+    [SerializeField] private Ball ballPrefab;
+    [SerializeField] private float emptyChance;
+    [SerializeField] private int rowsCount;
+    [SerializeField] private ColorsProvider colorProvider;
 
     public UnityEvent onPlaceBallFinish { get; private set; }
 
@@ -27,6 +35,32 @@ public class GridBalls : MonoBehaviour
                 _grid = GetComponent<Grid>();
 
             return _grid;
+        }
+    }
+    
+    public void Init()
+    {
+        onPlaceBallFinish = new UnityEvent();
+        _grid = GetComponent<Grid>();
+        CreateRandomBalls();
+        Fit();
+    }
+
+    private void CreateRandomBalls()
+    {
+        for (var i = 0; i < rowsCount * gridWidth; i++)
+        {
+            var spawnBall = Random.Range(0f, 1f) > emptyChance;
+            if (spawnBall)
+            {
+                var ball = Instantiate(ballPrefab);
+                ball.transform.SetParent(transform);
+                ball.SetColor(colorProvider.GetRandom().ColorName);
+            }
+            else
+            {
+                Instantiate(new GameObject()).transform.SetParent(transform);
+            }
         }
     }
 
@@ -62,13 +96,6 @@ public class GridBalls : MonoBehaviour
                   || offset.y >= gridHeight)).ToArray();
     }
 
-    private void Awake()
-    {
-        onPlaceBallFinish = new UnityEvent();
-        _grid = GetComponent<Grid>();
-        Fit();
-    }
-
     [ContextMenu("Fit")]
     private void Fit()
     {
@@ -93,7 +120,8 @@ public class GridBalls : MonoBehaviour
                 gridPosition.y += 1;
             }
         }
-        FallAllFreeBalls();
+
+        FallAllFreeBalls(false);
     }
 
     public void PlaceBall(Ball flyBall, Ball collisionBall)
@@ -111,13 +139,18 @@ public class GridBalls : MonoBehaviour
         flyBall.Place();
         flyBall.SetGridPosition(position);
         flyBall.transform.SetParent(transform);
-        flyBall.LocalMoveToPositionAnimated(Grid.GetCellCenterLocal(position));
+        flyBall.MagnetToPositionLocal(Grid.GetCellCenterLocal(position));
         
         var properBalls = CheckNeighborsColor(flyBall);
         if (properBalls.Length >= 3)
             DestroyBalls(properBalls);
         
-        FallAllFreeBalls();
+        FallAllFreeBalls(true);
+
+        if (IsGridEmpty())
+        {
+            gameUi.SetActive(true);
+        }
         
         onPlaceBallFinish.Invoke();
     }
@@ -127,7 +160,7 @@ public class GridBalls : MonoBehaviour
         return positions.Where(pos => GetBall(pos) == default).ToArray();
     }
 
-    private void FallAllFreeBalls()
+    private void FallAllFreeBalls(bool animated)
     {
         var saveBalls = new List<Ball>();
         var gridPosition = new Vector3Int(0, 0);
@@ -144,7 +177,12 @@ public class GridBalls : MonoBehaviour
         foreach (var ball in _awesomeBalls)
         {
             if (!saveBalls.Contains(ball) && ball != null)
-                ball.FallDestroy();
+            {
+                if (animated)
+                    ball.FallDestroy();
+                else 
+                    Destroy(ball.gameObject);
+            }
         }
     }
 
@@ -164,6 +202,11 @@ public class GridBalls : MonoBehaviour
         {
             AddAllConnectedBallsRecursively(GetBall(neighbor), balls);
         }
+    }
+
+    private bool IsGridEmpty()
+    {
+        return _awesomeBalls.Cast<Ball>().All(ball => ball == null);
     }
 
     private Ball[] CheckNeighborsColor(Ball ball, List<Ball> balls = null)

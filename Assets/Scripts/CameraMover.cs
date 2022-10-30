@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class GridMover : MonoBehaviour
+public class CameraMover : MonoBehaviour
 {
-    [SerializeField] private GridBalls grid;
+    [SerializeField] private Camera camera;
     [SerializeField] private Vector3 moveSpeed;
-    [SerializeField] private float minYValue;
+    [SerializeField] private float maxYValue;
 
     private List<Ball> _ballsInside;
 
@@ -19,12 +19,12 @@ public class GridMover : MonoBehaviour
 
     private void Update()
     {
-        if (grid.transform.position.y < minYValue || _ballsInside.Any(ball => ball.IsInGrid && ball))
+        if (camera.transform.position.y > maxYValue || _ballsInside.Any(ball => ball.IsInGrid && ball))
         {
             return;
         }
 
-        grid.transform.position += moveSpeed * Time.deltaTime;
+        camera.transform.position += moveSpeed * Time.deltaTime;
     }
 
     private void OnTriggerEnter(Collider other)

@@ -13,12 +13,16 @@ public class Ball : MonoBehaviour
     [SerializeField] private Ease scaleEase;
     [SerializeField] private float moveSpeed;
     [SerializeField] private Ease moveEase;
+    [SerializeField] private float magnetSpeed;
+    [SerializeField] private Ease magnetEase;
     [SerializeField] private float shootSpeed;
     [SerializeField] private float dieScaleTime;
     [SerializeField] private Ease dieEase;
     [SerializeField] private Vector3 dieForce;
+    [SerializeField] private float dieDelay;
 
     public UnityEvent<Ball> OnBallCollision { get; private set; }
+    public UnityEvent OnDestroyAction { get; private set; }
     public Vector3Int GridPosition { get; private set; }
     public bool IsInGrid { get; private set; }
     public bool IsInReserve { get; private set; }
@@ -50,6 +54,7 @@ public class Ball : MonoBehaviour
 
     public void Init()
     {
+        OnDestroyAction = new UnityEvent();
         OnBallCollision = new UnityEvent<Ball>();
         
         _rigidbody = GetComponent<Rigidbody>();
@@ -98,13 +103,13 @@ public class Ball : MonoBehaviour
     public void MoveToPositionAnimated(Vector3 position, Action onEndAction = null)
     {
         KillMoveTween();
-        _moveTween = transform.DOMove(position, GetMoveSpeed(position)).SetEase(moveEase).OnComplete(() => onEndAction?.Invoke());
+        _moveTween = transform.DOMove(position, GetMoveSpeed(position, moveSpeed)).SetEase(moveEase).OnComplete(() => onEndAction?.Invoke());
     }
-    
-    public void LocalMoveToPositionAnimated(Vector3 position, Action onEndAction = null)
+
+    public void MagnetToPositionLocal(Vector3 position, Action onEndAction = null)
     {
         KillMoveTween();
-        _moveTween = transform.DOLocalMove(position, GetMoveSpeed(position)).SetEase(moveEase).OnComplete(() => onEndAction?.Invoke());
+        _moveTween = transform.DOLocalMove(position, GetMoveSpeed(position, magnetSpeed)).SetEase(magnetEase).OnComplete(() => onEndAction?.Invoke());
     }
 
     public void ShootInDirection(Vector3 direction)
@@ -135,6 +140,13 @@ public class Ball : MonoBehaviour
         _rigidbody.isKinematic = false;
         SetColliderActive(false);
         _rigidbody.AddForce(dieForce, ForceMode.Impulse);
+        StartCoroutine(DestroyDelayed());
+    }
+
+    private IEnumerator DestroyDelayed()
+    {
+        yield return new WaitForSeconds(dieDelay);
+        Destroy(gameObject);
     }
 
     public void Place()
@@ -144,9 +156,9 @@ public class Ball : MonoBehaviour
         IsInGrid = true;
     }
 
-    private float GetMoveSpeed(Vector3 position)
+    private float GetMoveSpeed(Vector3 position, float speed)
     {
-        return Vector3.Distance(position, transform.position) / moveSpeed;
+        return Vector3.Distance(position, transform.position) / speed;
     }
 
     private void KillScaleTween()
@@ -166,6 +178,11 @@ public class Ball : MonoBehaviour
     private void OnValidate()
     {
         Renderer.sharedMaterial = GetMaterial();
+    }
+
+    private void OnDestroy()
+    {
+        OnDestroyAction.Invoke();
     }
 
     private void OnCollisionEnter(Collision other)

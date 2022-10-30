@@ -23,9 +23,6 @@ public class BallsStack : MonoBehaviour
 
     [SerializeField] private BallCreator ballCreator;
     [SerializeField] private Transform ballsParent;
-    [SerializeField] private Vector3 switchRotation;
-    [SerializeField] private float switchAnimationTime;
-    [SerializeField] private Ease switchEase;
     [SerializeField] private BallPosition shootPosition;
     [SerializeField] private BallPosition reservePosition;
 
@@ -36,31 +33,6 @@ public class BallsStack : MonoBehaviour
         var ball = shootPosition.BallInPosition;
         MoveReserve();
         return ball;
-    }
-
-    public void SwitchBalls()
-    {
-        if (IsBusyForAnimation) return;
-        IsBusyForAnimation = true;
-        var rotation = ballsParent.transform.rotation;
-        ballsParent.transform.DORotate(switchRotation, switchAnimationTime).SetEase(switchEase).OnComplete(() =>
-        {
-            var ball = shootPosition.BallInPosition;
-            shootPosition.SetBallInPosition(reservePosition.BallInPosition);
-            reservePosition.SetBallInPosition(ball);
-
-
-            var shootBall = shootPosition.BallInPosition;
-            var reserveBall = reservePosition.BallInPosition;
-            shootBall.SetInReserve(false);
-            reserveBall.SetInReserve(true);
-            (shootBall.transform.position, reserveBall.transform.position) = (
-                reserveBall.transform.position, shootBall.transform.position);
-
-            ballsParent.transform.rotation = rotation;
-
-            IsBusyForAnimation = false;
-        });
     }
 
     private void MoveReserve()

@@ -115,12 +115,15 @@ MonoBehaviour:
   colorName: 0
   startScaleTime: 0.5
   scaleEase: 27
-  moveSpeed: 120
-  moveEase: 1
-  shootSpeed: 20
+  moveSpeed: 10
+  moveEase: 28
+  magnetSpeed: 120
+  magnetEase: 1
+  shootSpeed: 30
   dieScaleTime: 0.25
   dieEase: 26
   dieForce: {x: 0, y: 2, z: 0}
+  dieDelay: 3
 --- !u!54 &2142075451289704797
 Rigidbody:
   m_ObjectHideFlags: 0
