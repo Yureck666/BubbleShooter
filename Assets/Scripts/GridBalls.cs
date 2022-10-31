@@ -151,7 +151,7 @@ public class GridBalls : MonoBehaviour
 
         if (IsGridEmpty())
         {
-            gameUi.SetActive(true);
+            gameUi.SetWinPanelActive(true);
         }
         
         onPlaceBallFinish.Invoke();
@@ -180,6 +180,7 @@ public class GridBalls : MonoBehaviour
         {
             if (!saveBalls.Contains(ball) && ball != null)
             {
+                _awesomeBalls[ball.GridPosition.x, ball.GridPosition.y] = null;
                 if (animated)
                     ball.FallDestroy();
                 else 
