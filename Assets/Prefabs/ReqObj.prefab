@@ -1134,7 +1134,8 @@ GameObject:
   - component: {fileID: 4414041607351763940}
   - component: {fileID: 4414041607351763941}
   - component: {fileID: 4414041607351763942}
-  m_Layer: 6
+  - component: {fileID: 8148500125256194238}
+  m_Layer: 0
   m_Name: Border (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1149,8 +1150,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4414041607351763930}
   m_LocalRotation: {x: 0.5, y: -0.5, z: 0.5, w: 0.5}
-  m_LocalPosition: {x: 4.63, y: 8.286789, z: 0}
-  m_LocalScale: {x: 1, y: 30, z: 1}
+  m_LocalPosition: {x: 4.63, y: 8.76, z: 0}
+  m_LocalScale: {x: 1, y: 30, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4414041608741434109}
@@ -1190,6 +1191,48 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   behaviour: 0
+--- !u!23 &8148500125256194238
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4414041607351763930}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 7185ccc69067a8447a80dce217b78032, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &4414041607387231535
 GameObject:
   m_ObjectHideFlags: 0
@@ -1456,7 +1499,7 @@ Camera:
   far clip plane: 15
   field of view: 86
   orthographic: 1
-  orthographic size: 8.797778
+  orthographic size: 9.167778
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1492,7 +1535,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fdd04b3c665d6464f93d7d227746c2aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  multiply: 4.28
+  multiply: 4.46
 --- !u!1 &4414041608606320986
 GameObject:
   m_ObjectHideFlags: 0
@@ -1553,7 +1596,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   camera: {fileID: 4414041608323205366}
   moveSpeed: {x: 0, y: 4, z: 0}
-  maxYValue: 5.3
+  maxYValue: 5.75
 --- !u!1 &4414041608741434098
 GameObject:
   m_ObjectHideFlags: 0

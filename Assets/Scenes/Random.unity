@@ -301,7 +301,11 @@ PrefabInstance:
       objectReference: {fileID: 1303202205}
     - target: {fileID: 4414041608323205366, guid: caca662b199fc514d9a632d1876a78fc, type: 3}
       propertyPath: orthographic size
-      value: 8.797778
+      value: 9.167778
+      objectReference: {fileID: 0}
+    - target: {fileID: 4414041608606320998, guid: caca662b199fc514d9a632d1876a78fc, type: 3}
+      propertyPath: maxYValue
+      value: 5.75
       objectReference: {fileID: 0}
     - target: {fileID: 5028679238865653918, guid: caca662b199fc514d9a632d1876a78fc, type: 3}
       propertyPath: m_RootOrder
