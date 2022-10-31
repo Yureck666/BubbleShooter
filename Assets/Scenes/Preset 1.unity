@@ -9109,6 +9109,7 @@ MonoBehaviour:
   gridWidth: 9
   gridHeight: 25
   ballsDestroyInterval: 0.01
+  ballsToDestroy: 3
   gameUi: {fileID: 3438526341018345785}
   ballPrefab: {fileID: 5028911471553362182, guid: 9e7bf0acd51b4bb4c817580ea092689d, type: 3}
   emptyChance: 0.05

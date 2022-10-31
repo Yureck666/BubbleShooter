@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 using Random = UnityEngine.Random;
@@ -14,8 +15,9 @@ public class GridBalls : MonoBehaviour
     [SerializeField] private int gridWidth;
     [SerializeField] private int gridHeight;
     [SerializeField] private float ballsDestroyInterval;
+    [SerializeField] private int ballsToDestroy;
     [SerializeField] private GameUi gameUi;
-    
+
     [Space, Header("Random")]
     [SerializeField] private Ball ballPrefab;
     [SerializeField] private float emptyChance;
@@ -127,10 +129,7 @@ public class GridBalls : MonoBehaviour
     public void PlaceBall(Ball flyBall, Ball collisionBall)
     {
         Debug.DrawRay(collisionBall.transform.position, Vector3.back * 3, Color.white, 2);
-        foreach (var neighbor in GetNeighbors(collisionBall.GridPosition))
-        {
-            Debug.DrawRay(Grid.GetCellCenterWorld(neighbor), Vector3.back * 3, Color.black, 2);
-        }
+        
 
         var position = GetFreePositions(GetNeighbors(collisionBall.GridPosition))
             .OrderBy(pos => Vector3.Distance(Grid.GetCellCenterWorld(pos), flyBall.transform.position))
@@ -140,9 +139,12 @@ public class GridBalls : MonoBehaviour
         flyBall.SetGridPosition(position);
         flyBall.transform.SetParent(transform);
         flyBall.MagnetToPositionLocal(Grid.GetCellCenterLocal(position));
+        flyBall.gameObject.name = $"Ball {position}";
         
         var properBalls = CheckNeighborsColor(flyBall);
-        if (properBalls.Length >= 3)
+        Debug.Log(properBalls.Length);
+        //EditorApplication.isPaused = true;
+        if (properBalls.Length >= ballsToDestroy)
             DestroyBalls(properBalls);
         
         FallAllFreeBalls(true);
@@ -188,7 +190,8 @@ public class GridBalls : MonoBehaviour
 
     private void AddAllConnectedBallsRecursively(Ball ball, List<Ball> balls)
     {
-        balls.Add(ball);
+        if (!balls.Contains(ball)) 
+            balls.Add(ball);
         var neighbors = GetNeighbors(ball.GridPosition)
             .Where(neighbor =>
             {
@@ -212,7 +215,8 @@ public class GridBalls : MonoBehaviour
     private Ball[] CheckNeighborsColor(Ball ball, List<Ball> balls = null)
     {
         balls ??= new List<Ball>();
-        balls.Add(ball);
+        if (!balls.Contains(ball)) 
+            balls.Add(ball);
         var neighbors = GetNeighbors(ball.GridPosition)
             .Where(neighbor =>
             {
